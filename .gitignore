@@ -1,0 +1,7 @@
+# 此行为注释 会被Git忽略
+
+# 忽略 Git 的一些操作.assets/ 目录下所有的文件
+Git 的一些操作.assets
+
+# 忽略 Git 的一些操作.md文件
+Git 的一些操作.md
