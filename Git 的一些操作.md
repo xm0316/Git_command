@@ -1212,7 +1212,7 @@ With a -m or -M option, will be renamed to . If exists, -M must be used to force
 
 切换回`master`分支后，再查看一个`readme.txt`文件，刚才添加的内容不见了！因为那个提交是在`dev`分支上，而`master`分支此刻的提交点并没有变：
 
-![git-br-on-master](/static/img/loading.svg)
+![](https://gitee.com/xm0316/drawingbed/raw/master/202308130923513.png)
 
 现在，我们把`dev`分支的工作成果合并到`master`分支上：    
 
