@@ -816,10 +816,10 @@ nothing to commit, working tree clean
 
 场景2：当你不但改乱了工作区某个文件的内容，还添加到了暂存区时，想丢弃修改，分两步，第一步用命令`git reset HEAD <file>` 丢弃暂存区添加的文件修改，就回到了场景1，第二步按场景1操作。
 
-|                | 旧版本                   | 新版本                       |
-| -------------- | ------------------------ | ---------------------------- |
-| 丢弃工作区修改 | `git checkout -- <file>` | `git restore <file>`         |
-| 丢弃暂存区修改 | `git reset HEAD <file>`  | `git restore --stage <file>` |
+|                | 旧版本                   | 新版本                        |
+| -------------- | ------------------------ | ----------------------------- |
+| 丢弃工作区修改 | `git checkout -- <file>` | `git restore <file>`          |
+| 丢弃暂存区修改 | `git reset HEAD <file>`  | `git restore --staged <file>` |
 
 场景3：已经提交了不合适的修改到版本库时，想要撤销本次提交，参考[版本回退](/wiki/896043488029600/897013573512192)一节，不过前提是没有推送到远程库。 `git reset --hard <file>`
 
