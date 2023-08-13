@@ -1278,7 +1278,7 @@ Git鼓励大量使用分支：
 
 删除分支：`git branch -d <name>`
 
-
+切换分支前, 要add和commit所有修改; 
 
 
 
