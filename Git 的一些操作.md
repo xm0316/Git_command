@@ -1051,7 +1051,9 @@ fingerprints/)是否与SSH连接给出的一致。
 
 此后，每次本地提交后，只要有必要，就可以使用命令`git push origin master`推送最新修改；
 
-分布式版本系统的最大好处之一是在本地工作完全不需要考虑远程库的存在，也就是有没有联网都可以正常工作，而SVN在没有联网的时候是拒绝干活的！当有网络的时候，再把本地提交推送一下就完成了同步，真是太方便了！
+分布式版本系统的最大好处之一是在本地工作完全不需要考虑远程库的存在，也就是有没有联网都可以正常工作，而SVN在没有联网的时候是拒绝干活的！
+
+当有网络的时候，再把本地提交推送一下就完成了同步，真是太方便了！
 
 > 新的关联推送操作 
 
@@ -1066,6 +1068,283 @@ git push -u origin main # origin:远程仓库名, main:本地仓库主分支名
 With a -m or -M option, will be renamed to . If exists, -M must be used to force the rename to happen.
 
 把master改名为main(黑人的政治正确运动).
+
+
+
+### 从远程库克隆
+
+上次我们讲了先有本地库，后有远程库的时候，如何关联远程库。
+
+现在，假设我们从零开发，那么最好的方式是先创建远程库，然后，从远程库克隆。
+
+首先，登陆GitHub，创建一个新的仓库，名字叫`gitskills`：
+
+![github-init-repo](Git 的一些操作.assets/0-1691881536566-13.png)
+
+我们勾选Initialize this repository with a README，这样GitHub会自动为我们创建一个`README.md`文件。创建完毕后，可以看到`README.md`文件：
+
+![github-init-repo-2](Git 的一些操作.assets/0-1691881542958-16.png)
+
+现在，远程库已经准备好了，下一步是用命令`git clone`克隆一个本地库：
+
+    $ git clone git@github.com:michaelliao/gitskills.git
+    Cloning into 'gitskills'...
+    remote: Counting objects: 3, done.
+    remote: Total 3 (delta 0), reused 0 (delta 0), pack-reused 3
+    Receiving objects: 100% (3/3), done.
+
+
+注意把Git库的地址换成你自己的，然后进入`gitskills`目录看看，已经有`README.md`文件了：    
+
+    $ cd gitskills
+    $ ls
+    README.md
+
+
+如果有多个人协作开发，那么每个人各自从远程克隆一份就可以了。
+
+你也许还注意到，GitHub给出的地址不止一个，还可以用`https://github.com/michaelliao/gitskills.git`这样的地址。实际上，Git支持多种协议，默认的`git://`使用ssh，但也可以使用`https`等其他协议。
+
+使用`https`除了速度慢以外，还有个最大的麻烦是每次推送都必须输入口令，但是在某些只开放http端口的公司内部就无法使用`ssh`协议而只能用`https`。
+
+### 小结
+
+要克隆一个仓库，首先必须知道仓库的地址，然后使用`git clone`命令克隆。
+
+Git支持多种协议，包括`https`，但`ssh`协议速度最快。
+
+## 分支管理
+
+分支就是科幻电影里面的平行宇宙，当你正在电脑前努力学习Git的时候，另一个你正在另一个平行宇宙里努力学习SVN。
+
+如果两个平行宇宙互不干扰，那对现在的你也没啥影响。不过，在某个时间点，两个平行宇宙合并了，结果，你既学会了Git又学会了SVN！
+
+![learn-branches](https://gitee.com/xm0316/drawingbed/raw/master/202308130716299.png)
+
+分支在实际中有什么用呢？假设你准备开发一个新功能，但是需要两周才能完成，第一周你写了50%的代码，如果立刻提交，由于代码还没写完，不完整的代码库会导致别人不能干活了。如果等代码全部写完再一次提交，又存在丢失每天进度的巨大风险。
+
+现在有了分支，就不用怕了。你创建了一个属于你自己的分支，别人看不到，还继续在原来的分支上正常工作，而你在自己的分支上干活，想提交就提交，直到开发完毕后，再一次性合并到原来的分支上，这样，既安全，又不影响别人工作。
+
+其他版本控制系统如SVN等都有分支管理，但是用过之后你会发现，这些版本控制系统创建和切换分支比蜗牛还慢，简直让人无法忍受，结果分支功能成了摆设，大家都不去用。
+
+***但Git的分支是与众不同的，无论创建、切换和删除分支，Git在1秒钟之内就能完成！***无论你的版本库是1个文件还是1万个文件。
+
+
+
+### 创建与合并分支
+
+在[版本回退](/wiki/896043488029600/897013573512192)里，你已经知道，每次提交，Git都把它们串成一条时间线，这条时间线就是一个分支。截止到目前，只有一条时间线，在Git里，这个分支叫主分支，即`master`分支。`HEAD`严格来说不是指向提交，而是指向`master`，`master`才是指向提交的，所以，`HEAD`指向的就是当前分支。
+
+一开始的时候，`master`分支是一条线，Git用`master`指向最新的提交，再用`HEAD`指向`master`，就能确定当前分支，以及当前分支的提交点：
+
+                      HEAD
+                        │
+                        │
+                        ▼
+                     master
+                        │
+                        │
+                        ▼
+    ┌───┐     ┌───┐    ┌───┐
+    │   │───▶│   │───▶│   │
+    └───┘     └───┘    └───┘
+
+
+每次提交，`master`分支都会向前移动一步，这样，随着你不断提交，`master`分支的线也越来越长。
+
+当我们创建新的分支，例如`dev`时，Git新建了一个指针叫`dev`，指向`master`相同的提交，再把`HEAD`指向`dev`，就表示当前分支在`dev`上： 
+
+                     master
+                        │
+                        │
+                        ▼
+    ┌───┐    ┌───┐    ┌───┐
+    │   │───▶│   │───▶│   │
+    └───┘    └───┘    └───┘
+                        ▲
+                        │
+                        │
+                       dev
+                        ▲
+                        │
+                        │
+                      HEAD
+
+
+你看，Git创建一个分支很快，因为除了增加一个`dev`指针，改改`HEAD`的指向，工作区的文件都没有任何变化！
+
+不过，从现在开始，对工作区的修改和提交就是针对`dev`分支了，比如新提交一次后，`dev`指针往前移动一步，而`master`指针不变：
+
+                     master
+                        │
+                        │
+                        ▼
+    ┌───┐    ┌───┐    ┌───┐    ┌───┐
+    │   │───▶│   │───▶│   │───▶│   │
+    └───┘    └───┘    └───┘    └───┘
+                                 ▲
+                                 │
+                                 │
+                                dev
+                                 ▲
+                                 │
+                                 │
+                               HEAD
+
+
+假如我们在`dev`上的工作完成了，就可以把`dev`合并到`master`上。Git怎么合并呢？最简单的方法，就是直接把`master`指向`dev`的当前提交，就完成了合并：
+
+                               HEAD
+                                 │
+                                 │
+                                 ▼
+                              master
+                                 │
+                                 │
+                                 ▼
+    ┌───┐    ┌───┐    ┌───┐    ┌───┐
+    │   │───▶│   │───▶│   │───▶│   │
+    └───┘    └───┘    └───┘    └───┘
+                                 ▲
+                                 │
+                                 │
+                                dev
+
+
+所以Git合并分支也很快！就改改指针，工作区内容也不变！
+
+合并完分支后，甚至可以删除`dev`分支。删除`dev`分支就是把`dev`指针给删掉，删掉后，我们就剩下了一条`master`分支：
+
+                               HEAD
+                                 │
+                                 │
+                                 ▼
+                              master
+                                 │
+                                 │
+                                 ▼
+    ┌───┐    ┌───┐    ┌───┐    ┌───┐
+    │   │───▶│   │───▶│   │───▶│   │
+    └───┘    └───┘    └───┘    └───┘
+
+
+真是太神奇了，你看得出来有些提交是通过分支完成的吗？
+
+下面开始实战。
+
+首先，我们创建`dev`分支，然后切换到`dev`分支： 
+
+```shell
+$ git checkout -b dev
+Switched to a new branch 'dev'
+```
+
+`git checkout`命令加上`-b`参数**表示创建并切换**，相当于以下两条命令：   
+
+    $ git branch dev
+    $ git checkout dev
+    Switched to branch 'dev'
+
+
+然后，用`git branch`命令查看当前分支：    
+
+    $ git branch
+    * dev
+      master
+
+`git branch`命令会列出所有分支，**当前分支**前面会标一个`*`号。
+
+然后，我们就可以在`dev`分支上正常提交，比如对`readme.txt`做个修改，加上一行：
+
+    Creating a new branch is quick.
+
+
+然后提交：
+
+    $ git add readme.txt 
+    $ git commit -m "branch test"
+    [dev b17d20e] branch test
+     1 file changed, 1 insertion(+)
+
+
+现在，`dev`分支的工作完成，我们就可以切换回`master`分支：   
+
+    $ git checkout master
+    Switched to branch 'master'
+
+
+切换回`master`分支后，再查看一个`readme.txt`文件，刚才添加的内容不见了！因为那个提交是在`dev`分支上，而`master`分支此刻的提交点并没有变：
+
+![git-br-on-master](https://gitee.com/xm0316/drawingbed/raw/master/202308130914650.png)
+
+现在，我们把`dev`分支的工作成果合并到`master`分支上：    
+
+    $ git merge dev
+    Updating d46f35e..b17d20e
+    Fast-forward
+     readme.txt | 1 +
+     1 file changed, 1 insertion(+)
+
+
+`git merge`命令用于合并指定分支到当前分支。合并后，再查看`readme.txt`的内容，就可以看到，和`dev`分支的最新提交是完全一样的。
+
+注意到上面的`Fast-forward`信息，Git告诉我们，这次合并是“快进模式”，也就是直接把`master`指向`dev`的当前提交，所以合并速度非常快。
+
+当然，也不是每次合并都能`Fast-forward`，我们后面会讲其他方式的合并。
+
+合并完成后，就可以放心地删除`dev`分支了：
+
+    $ git branch -d dev
+    Deleted branch dev (was b17d20e).
+
+
+删除后，查看`branch`，就只剩下`master`分支了：
+
+    $ git branch
+    * master
+
+
+因为创建、合并和删除分支非常快，所以Git鼓励你使用分支完成某个任务，合并后再删掉分支，这和直接在`master`分支上工作效果是一样的，但过程更安全。
+
+#### switch
+
+我们注意到切换分支使用`git checkout <branch>`，而前面讲过的撤销修改则是`git checkout -- <file>`，同一个命令，有两种作用，确实有点令人迷惑。
+
+实际上，切换分支这个动作，用`switch`更科学。因此，最新版本的Git提供了新的`git switch`命令来切换分支：
+
+**创建并切换到新的**`dev`分支，可以使用：
+
+    $ git switch -c dev
+
+
+直接切换到已有的`master`分支，可以使用：   
+
+    $ git switch master
+
+
+使用新的`git switch`命令，比`git checkout`要更容易理解。
+
+#### 小结
+
+Git鼓励大量使用分支：
+
+查看分支：`git branch`
+
+创建分支：`git branch <name>`
+
+切换分支：`git checkout <name>`或者`git switch <name>`
+
+创建+切换分支：`git checkout -b <name>`或者`git switch -c <name>`
+
+合并某分支到当前分支：`git merge <name>`
+
+删除分支：`git branch -d <name>`
+
+
+
+
+
+
 
 
 
