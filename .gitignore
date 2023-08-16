@@ -5,3 +5,8 @@ Git 的一些操作.assets
 
 # 忽略 Git 的一些操作.md文件
 Git 的一些操作.md
+
+# 忽略文件
+*.mmap 
+*.bak
+*.~$lock
