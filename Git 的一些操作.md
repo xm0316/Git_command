@@ -88,7 +88,7 @@ git push -u origin master（由于新建的GitHub仓库是空的，所以第一�
 
 这有一点说明的就是这里配置的是https的方式，可以配置成ssh的方式，因为http上的方式每次推向远程仓库的时候都会让你输入密码，有点麻烦：
 
-![img](https://gitee.com/xm0316/drawingbed/raw/master/202308120303032.jpg)
+![](https://gitee.com/xm0316/drawingbed/raw/master/202308120303032.jpg)
 
 切换的方法，如下图所示，只要跟着下面的命令进行操作就能随意进行协议的切换了，还是比较简单的，这里就直接略过：
 
@@ -489,7 +489,7 @@ eaadf4e HEAD@{4}: commit (initial): wrote a readme file
 
 ### 工作区和暂存区
 
-Git和其他版本控制系统如SVN的一个不同之处就是有暂存区的概念。
+Git和其他版本控制系统如SVN的一个不同之处就是有**暂存区(stage/index)**的概念。
 
 #### 工作区（Working Directory）
 
@@ -589,7 +589,7 @@ nothing to commit, working tree clean
 
 #### 小结
 
-暂存区是Git非常重要的概念，弄明白了暂存区，就弄明白了Git的很多操作到底干了什么。
+暂存区(stage/index)是Git非常重要的概念，弄明白了暂存区，就弄明白了Git的很多操作到底干了什么。
 
 
 
@@ -684,7 +684,7 @@ index 76d770f..a9c5755 100644
 
 #### 小结
 
-现在，你又理解了Git是如何跟踪修改的，每次修改，如果不用`git add`到**暂存区**，那就不会加入到`commit`中。
+现在，你又理解了Git是如何跟踪修改的，每次修改，如果不通过`git add`到**暂存区**，那就不会加入到`commit`中。
 
 `git diff HEAD -- readme.txt`命令可以**查看工作区和版本库里面最新版本**的区别.
 
@@ -831,7 +831,7 @@ nothing to commit, working tree clean
 | 丢弃工作区修改 | `git checkout -- <file>` | `git restore <file>`         |
 | 丢弃暂存区修改 | `git reset HEAD <file>`  | `git restore --stage <file>` |
 
-场景3：已经提交了不合适的修改到版本库时，想要撤销本次提交，参考[版本回退](/wiki/896043488029600/897013573512192)一节，不过前提是没有推送到远程库。 `git reset --hard <file>`
+场景3：已经提交了不合适的修改到**版本库**时，想要撤销本次提交，参考[版本回退](/wiki/896043488029600/897013573512192)一节，不过前提是没有推送到远程库。 `丢弃版本库更改(版本回退):    git reset --hard <commit_id>`
 
 
 
@@ -1364,8 +1364,6 @@ Git鼓励大量使用分支：
 
 
 ## Git 操作
-
-
 
 针对自己的项目更新部分文件
 
