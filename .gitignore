@@ -7,6 +7,6 @@ Git 的一些操作.assets
 Git 的一些操作.md
 
 # 忽略文件
-*.mmap 
+# *.mmap 
 *.bak
 *.~$lock
